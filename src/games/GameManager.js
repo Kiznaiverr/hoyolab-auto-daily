@@ -4,7 +4,7 @@ const ZenlessZoneZero = require('./ZenlessZoneZero');
 const HonkaiImpact = require('./HonkaiImpact');
 const TearsOfThemis = require('./TearsOfThemis');
 const logger = require('../utils/logger');
-const discord = require('../utils/discord');
+const config = require('../utils/config');
 
 class GameManager {
     constructor() {
@@ -29,7 +29,7 @@ class GameManager {
         return Object.keys(this.games);
     }
 
-    async checkInAllGames(accountName, gameConfigs, cookie) {
+    async checkInAllGames(accountName, gameConfigs) {
         const results = {};
         let summary = { total: 0, success: 0, failed: 0, alreadyChecked: 0 };
         
@@ -41,6 +41,13 @@ class GameManager {
             const game = this.getGame(gameName);
             if (!game) {
                 logger.warn(`Unknown game: ${gameName}`);
+                continue;
+            }
+
+            // Ambil cookie untuk akun ini
+            const cookie = config.getCookie(accountName, gameName);
+            if (!cookie) {
+                logger.warn(`Cookie tidak ditemukan untuk ${accountName} - ${gameName}`);
                 continue;
             }
 
@@ -73,17 +80,19 @@ class GameManager {
             }
         }
 
-        if (summary.total > 0) {
-            await discord.notifyDailySummary(summary);
-        }
-
         return results;
     }
 
-    async checkInSingleGame(accountName, gameName, cookie) {
+    async checkInSingleGame(accountName, gameName) {
         const game = this.getGame(gameName);
         if (!game) {
             throw new Error(`Unknown game: ${gameName}`);
+        }
+
+        // Ambil cookie untuk akun ini
+        const cookie = config.getCookie(accountName, gameName);
+        if (!cookie) {
+            throw new Error(`Cookie tidak ditemukan untuk ${accountName} - ${gameName}`);
         }
 
         return await game.checkIn(accountName, cookie);

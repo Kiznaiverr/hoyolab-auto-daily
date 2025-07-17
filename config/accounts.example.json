@@ -2,6 +2,7 @@
   "accounts": [
     {
       "name": "Account 1",
+      "cookie": "your_hoyolab_cookie_here",
       "games": {
         "genshin": {
           "enabled": true,
@@ -17,6 +18,37 @@
           "enabled": false,
           "uid": "555666777",
           "username": "MyBini"
+        },
+        "honkai": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "tots": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        }
+      }
+    },
+    {
+      "name": "Account 2",
+      "cookie": "your_second_hoyolab_cookie_here",
+      "games": {
+        "genshin": {
+          "enabled": false,
+          "uid": "111222333",
+          "username": "MySecond"
+        },
+        "starrail": {
+          "enabled": true,
+          "uid": "444555666",
+          "username": "MyStarRail"
+        },
+        "zenless": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
         },
         "honkai": {
           "enabled": false,

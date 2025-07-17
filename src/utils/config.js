@@ -32,17 +32,6 @@ class ConfigManager {
     }
 
     validateConfig() {
-        const hoyolabCookie = process.env.HOYOLAB_COOKIE;
-        if (!hoyolabCookie || hoyolabCookie === 'ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;') {
-            logger.warn('HOYOLAB_COOKIE tidak dikonfigurasi di file .env. Silakan tambahkan cookie HoyoLab Anda.');
-            return;
-        }
-
-        if (!this.validateCookie(hoyolabCookie)) {
-            logger.error('Format HOYOLAB_COOKIE tidak valid. Cookie harus mengandung ltoken_v2, ltuid_v2, dan ltmid_v2');
-            return;
-        }
-
         if (this.accounts.length === 0) {
             logger.warn('Tidak ada akun yang dikonfigurasi');
             return;
@@ -51,6 +40,17 @@ class ConfigManager {
         this.accounts.forEach((account, index) => {
             if (!account.name) {
                 logger.warn(`Akun ${index + 1} tidak memiliki nama`);
+            }
+
+            // Validasi cookie untuk setiap akun
+            if (!account.cookie || account.cookie === 'your_cookie_here') {
+                logger.warn(`Akun "${account.name}" tidak memiliki cookie yang valid`);
+                return;
+            }
+
+            if (!this.validateCookie(account.cookie)) {
+                logger.error(`Akun "${account.name}" memiliki format cookie yang tidak valid. Cookie harus mengandung ltoken_v2, ltuid_v2, dan ltmid_v2`);
+                return;
             }
 
             if (!account.games) {
@@ -84,7 +84,7 @@ class ConfigManager {
             return null;
         }
 
-        return process.env.HOYOLAB_COOKIE;
+        return account.cookie;
     }
 
     getAccountInfo(accountName, gameName) {

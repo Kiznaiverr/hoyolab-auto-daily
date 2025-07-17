@@ -44,15 +44,9 @@ class Scheduler {
 
         try {
             const accounts = config.getAccounts();
-            const hoyolabCookie = process.env.HOYOLAB_COOKIE;
             
             if (accounts.length === 0) {
                 logger.warn('No accounts configured for check-in');
-                return;
-            }
-
-            if (!hoyolabCookie) {
-                logger.error('HOYOLAB_COOKIE not found in environment variables');
                 return;
             }
 
@@ -63,11 +57,15 @@ class Scheduler {
                 alreadySigned: 0
             };
 
-            for (const account of accounts) {
+            const accountDelay = parseInt(process.env.ACCOUNT_DELAY) || 5000;
+
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+                
                 try {
                     logger.info(`Processing account: ${account.name}`);
                     
-                    const accountResults = await gameManager.checkInAllGames(account.name, account.games, hoyolabCookie);
+                    const accountResults = await gameManager.checkInAllGames(account.name, account.games);
                     
                     Object.entries(accountResults).forEach(([game, result]) => {
                         results.total++;
@@ -83,8 +81,11 @@ class Scheduler {
                         }
                     });
 
-                    // Add delay between accounts to avoid rate limiting
-                    await this.sleep(5000);
+                    // Add delay between accounts to avoid rate limiting (skip delay for last account)
+                    if (i < accounts.length - 1) {
+                        logger.info(`Waiting ${accountDelay}ms before processing next account...`);
+                        await this.sleep(accountDelay);
+                    }
                     
                 } catch (error) {
                     logger.error(`Error processing account ${account.name}:`, error.message);
@@ -118,30 +119,22 @@ class Scheduler {
 
         try {
             const accounts = config.getAccounts();
-            const hoyolabCookie = process.env.HOYOLAB_COOKIE;
             
             if (accounts.length === 0) {
                 logger.warn('No accounts configured for check-in');
-                await discord.sendNotification(
-                    '⚠️ No Accounts Configured',
-                    'Bot started but no accounts found in configuration',
-                    0xffaa00
-                );
-                return;
-            }
-
-            if (!hoyolabCookie) {
-                logger.error('HOYOLAB_COOKIE not found in environment variables');
                 return;
             }
 
             let results = { total: 0, successful: 0, failed: 0, alreadySigned: 0 };
+            const accountDelay = parseInt(process.env.ACCOUNT_DELAY) || 5000;
 
-            for (const account of accounts) {
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+                
                 try {
                     logger.info(`Processing account: ${account.name}`);
                     
-                    const accountResults = await gameManager.checkInAllGames(account.name, account.games, hoyolabCookie);
+                    const accountResults = await gameManager.checkInAllGames(account.name, account.games);
                     
                     Object.entries(accountResults).forEach(([game, result]) => {
                         results.total++;
@@ -156,8 +149,11 @@ class Scheduler {
                         }
                     });
 
-                    // Add delay between accounts to avoid rate limiting
-                    await this.sleep(3000);
+                    // Add delay between accounts to avoid rate limiting (skip delay for last account)
+                    if (i < accounts.length - 1) {
+                        logger.info(`Waiting ${accountDelay}ms before processing next account...`);
+                        await this.sleep(accountDelay);
+                    }
                     
                 } catch (error) {
                     logger.error(`Error processing account ${account.name}:`, error.message);

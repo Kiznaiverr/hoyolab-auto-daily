@@ -31,7 +31,9 @@
 ## Fitur
 
 - ✅ **Dukungan Multi-Game**: Genshin Impact, Honkai Star Rail, Zenless Zone Zero
-- ✅ **Dukungan Multi-Account**: Konfigurasi beberapa akun untuk setiap game
+- ✅ **Dukungan Multi-Account**: Support beberapa akun dengan cookie yang berbeda
+- ✅ **Cookie Individual**: Setiap akun dapat menggunakan cookie HoyoLab yang berbeda
+- ✅ **Rate Limiting**: Delay otomatis 5 detik antar akun untuk menghindari spam
 - ✅ **Penjadwalan Otomatis**: Setup cron job untuk check-in harian otomatis
 - ✅ **Check-in Manual**: Jalankan check-in manual kapan saja diperlukan
 - ✅ **Notifikasi Discord**: Notifikasi real-time untuk semua aktivitas check-in
@@ -69,47 +71,61 @@ npm install
    - Cari request dengan nama getGameRecordCard
    - Salin nilai `Cookie` header
 
-3. **Konfigurasi cookie HoyoLab Anda di `.env`:**
+3. **Konfigurasi environment variables di `.env`:**
    ```bash
-   # Cookie HoyoLab (sama untuk semua game HoYoverse)
-   HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
+   # Jadwal check-in (format cron)
+   CHECKIN_SCHEDULE=5 0 * * *
+   
+   # Discord webhook untuk notifikasi
+   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+   
+   # Delay antar akun (5 detik)
+   ACCOUNT_DELAY=5000
    ```
 
-4. **Konfigurasi akun Anda di `config/accounts.json`:**
+4. **Konfigurasi akun di `config/accounts.json`:**
    ```json
-   [
-     {
-       "name": "Akun Gweh",
-       "games": {
-         "genshin": {
-           "enabled": true,
-           "uid": "123456789",
-           "username": "TravelerMain"
-         },
-         "honkai_star_rail": {
-           "enabled": true,
-           "uid": "987654321",
-           "username": "TrailblazerMain"
-         },
-         "zenless": {
-           "enabled": false,
-           "uid": "",
-           "username": ""
-         },
-         "honkai_impact": {
-           "enabled": false,
-           "uid": "",
-           "username": ""
-         },
-         "tears_of_themis": {
-           "enabled": false,
-           "uid": "",
-           "username": ""
+   {
+     "accounts": [
+       {
+         "name": "Akun Utama",
+         "cookie": "ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;",
+         "games": {
+           "genshin": {
+             "enabled": true,
+             "uid": "123456789",
+             "username": "TravelerMain"
+           },
+           "starrail": {
+             "enabled": true,
+             "uid": "987654321",
+             "username": "TrailblazerMain"
+           },
+           "zenless": {
+             "enabled": false,
+             "uid": "",
+             "username": ""
+           }
+         }
+       },
+       {
+         "name": "Akun Kedua",
+         "cookie": "ltoken_v2=second_ltoken_v2; ltuid_v2=second_ltuid_v2; ltmid_v2=second_ltmid_v2;",
+         "games": {
+           "genshin": {
+             "enabled": false,
+             "uid": "",
+             "username": ""
+           },
+           "starrail": {
+             "enabled": true,
+             "uid": "111222333",
+             "username": "SecondAccount"
+           }
          }
        }
-     }
-   ]
-   ```
+     ]
+   }
 
 5. **Sesuaikan pengaturan di `.env` (opsional):**
    ```bash
@@ -161,7 +177,9 @@ Aplikasi akan:
 - ✅ **Check-in Awal**: Auto check-in saat startup
 - ✅ **Notifikasi Discord**: Notifikasi real-time untuk semua aktivitas check-in
 - ✅ **Operasi Background**: Berjalan terus menerus di background
-- ✅ **Multiple Account**: Support lebih dari satu akun HoyoLab
+- ✅ **Multi-Account Support**: Support beberapa akun HoyoLab dengan cookie berbeda
+- ✅ **Rate Limiting**: Delay otomatis antar akun untuk menghindari spam
+- ✅ **Cookie Individual**: Setiap akun dapat menggunakan cookie yang berbeda
 
 ## Konfigurasi
 
@@ -178,10 +196,14 @@ RETRY_DELAY=5000
 # Timeout HTTP (milidetik)
 HTTP_TIMEOUT=30000
 
+# User Agent untuk request
+USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+
 # Discord Webhook untuk notifikasi
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
 
-# Cookie HoyoLab
+# Delay antar akun (milidetik) - untuk menghindari rate limiting
+ACCOUNT_DELAY=5000
 HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
 ```
 
@@ -194,63 +216,77 @@ HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_l
 
 ### Konfigurasi Akun
 
-File `config/accounts.json` support beberapa akun dan game. Karena semua game HoYoverse menggunakan cookie HoyoLab yang sama, Jadi cuma perlu konfigurasi sekali di `.env`:
+File `config/accounts.json` mendukung **multi-account** dengan cookie yang berbeda untuk setiap akun. Setiap akun dapat memiliki cookie HoyoLab yang berbeda:
 
-**Variabel Environment (.env):**
-```bash
-# Cookie HoyoLab (sama untuk semua game HoYoverse)
-HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
-```
-
-**Konfigurasi Akun (config/accounts.json):**
+**Konfigurasi Multi-Account (config/accounts.json):**
 ```json
-[
-  {
-    "name": "Akunmu",
-    "games": {
-      "genshin": {
-        "enabled": true,
-        "uid": "123456789",
-        "username": "TravelerMain"
-      },
-      "honkai_star_rail": {
-        "enabled": true,
-        "uid": "987654321",
-        "username": "TrailblazerMain"
-      },
-      "zenless": {
-        "enabled": false,
-        "uid": "",
-        "username": ""
-      },
-      "honkai_impact": {
-        "enabled": false,
-        "uid": "",
-        "username": ""
-      },
-      "tears_of_themis": {
-        "enabled": false,
-        "uid": "",
-        "username": ""
+{
+  "accounts": [
+    {
+      "name": "Akun Utama",
+      "cookie": "ltoken_v2=your_first_ltoken_v2; ltuid_v2=your_first_ltuid_v2; ltmid_v2=your_first_ltmid_v2;",
+      "games": {
+        "genshin": {
+          "enabled": true,
+          "uid": "123456789",
+          "username": "TravelerMain"
+        },
+        "starrail": {
+          "enabled": true,
+          "uid": "987654321",
+          "username": "TrailblazerMain"
+        },
+        "zenless": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "honkai": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "tots": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        }
+      }
+    },
+    {
+      "name": "Akun Kedua",
+      "cookie": "ltoken_v2=your_second_ltoken_v2; ltuid_v2=your_second_ltuid_v2; ltmid_v2=your_second_ltmid_v2;",
+      "games": {
+        "genshin": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "starrail": {
+          "enabled": true,
+          "uid": "111222333",
+          "username": "SecondAccount"
+        },
+        "zenless": {
+          "enabled": true,
+          "uid": "444555666",
+          "username": "ZenlessAlt"
+        },
+        "honkai": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "tots": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        }
       }
     }
-  },
-  {
-    "name": "Akun Ayang",
-    "games": {
-      "genshin": {
-        "enabled": true,
-        "uid": "555666777",
-        "username": "TravelerAlt"
-      },
-      "honkai_star_rail": {
-        "enabled": false,
-        "uid": "",
-        "username": ""
-      }
-    }
-  }
-]
+  ]
+}
+
 ```
 
 ## Cara Mendapatkan Cookie
@@ -261,7 +297,7 @@ HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_l
 4. **Pergi ke Tab Network**: Klik pada tab Network
 6. **Cari Request**: Cari request yang mengandung `getGameRecordCard` di kolom Name/URL
    - Request ini akan muncul otomatis saat halaman profile memuat data game
-7. **Salin Cookie**: Klik pada request `getGameRecordCard` → Headers → Request Headers → Salin seluruh bagian `Cookie`
+7. **Salin Cookie**: Klik pada request `getGameRecordCard` → Headers → Request Headers → Salin seluruh bagian `Response Header -> Cookie`
 
 ### Nilai Cookie yang Diperlukan
 

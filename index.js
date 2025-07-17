@@ -38,11 +38,6 @@ async function main() {
             process.exit(1);
         }
 
-        if (!process.env.HOYOLAB_COOKIE) {
-            logger.error('HOYOLAB_COOKIE not found in .env file');
-            process.exit(1);
-        }
-
         await discord.notifyBotStarted();
 
         logger.info('Running initial check-in...');
