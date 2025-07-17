@@ -1,21 +1,46 @@
 # HoyoLab Auto Daily Check-in
 
-🎮 Automated daily check-ins for HoyoLab games including Genshin Impact, Honkai Star Rail, Zenless Zone Zero, and more!
+🎮 Check-in harian otomatis untuk game HoyoLab termasuk Genshin Impact, Honkai Star Rail, Zenless Zone Zero, dan lainnya!
 
-## Features
+*[English](README-EN.md) | Bahasa Indonesia*
 
-- ✅ **Multi-Game Support**: Genshin Impact, Honkai Star Rail, Zenless Zone Zero
-- ✅ **Multi-Account Support**: Configure multiple accounts for each game
-- ✅ **Automated Scheduling**: Set up cron jobs for automatic daily check-ins
-- ✅ **Manual Check-ins**: Run check-ins manually when needed
-- ✅ **Comprehensive Logging**: Detailed logs with multiple levels
-- ✅ **Error Handling**: Retry mechanism and proper error handling
-- ✅ **Interactive CLI**: User-friendly command-line interface
-- ✅ **Cookie-based Authentication**: Secure authentication using HoyoLab cookies
+## 📚 Daftar Isi
 
-## Quick Start
+- [Fitur](#fitur)
+- [Panduan Cepat](#panduan-cepat)
+  - [1. Instalasi](#1-instalasi)
+  - [2. Konfigurasi](#2-konfigurasi)
+  - [3. Penggunaan](#3-penggunaan)
+- [Game yang Didukung](#game-yang-didukung)
+- [Fitur Utama](#fitur-utama)
+- [Konfigurasi](#konfigurasi)
+  - [Variabel Environment (.env)](#variabel-environment-env)
+  - [Contoh Jadwal Cron](#contoh-jadwal-cron)
+  - [Konfigurasi Akun](#konfigurasi-akun)
+- [Cara Mendapatkan Cookie](#cara-mendapatkan-cookie)
+  - [Nilai Cookie yang Diperlukan](#nilai-cookie-yang-diperlukan)
+- [Region Game](#region-game)
+  - [Genshin Impact](#genshin-impact)
+  - [Honkai Star Rail](#honkai-star-rail)
+  - [Zenless Zone Zero](#zenless-zone-zero)
+- [Keamanan](#keamanan)
+- [Lisensi](#lisensi)
+- [Disclaimer](#disclaimer)
+- [Support](#support)
 
-### 1. Installation
+## Fitur
+
+- ✅ **Dukungan Multi-Game**: Genshin Impact, Honkai Star Rail, Zenless Zone Zero
+- ✅ **Dukungan Multi-Account**: Konfigurasi beberapa akun untuk setiap game
+- ✅ **Penjadwalan Otomatis**: Setup cron job untuk check-in harian otomatis
+- ✅ **Check-in Manual**: Jalankan check-in manual kapan saja diperlukan
+- ✅ **Notifikasi Discord**: Notifikasi real-time untuk semua aktivitas check-in
+- ✅ **Penanganan Error**: Mekanisme retry dan penanganan error yang komprehensif
+- ✅ **Autentikasi Cookie**: Autentikasi aman menggunakan cookie HoyoLab
+
+## Panduan Cepat
+
+### 1. Instalasi
 
 ```bash
 # Clone repository
@@ -26,61 +51,72 @@ cd hoyolab-auto-daily
 npm install
 ```
 
-### 2. Configuration
+### 2. Konfigurasi
 
-1. **Copy configuration files:**
+1. **Salin file konfigurasi:**
    ```bash
    cp .env.example .env
    cp config/accounts.example.json config/accounts.json
    ```
 
-2. **Get your HoyoLab cookies:**
-   - Go to [HoyoLab](https://www.hoyolab.com/)
-   - Login to your account
-   - Open browser developer tools (F12)
-   - Go to Network tab
-   - Refresh the page
-   - Find any request to `hoyolab.com`
-   - Copy the `Cookie` header value
+2. **Dapatkan cookie HoyoLab Anda:**
+   - Pergi ke [HoyoLab](https://www.hoyolab.com/)
+   - Login ke akunmu
+   - pergi ke page profile
+   - Buka browser developer tools (F12)
+   - Pergi ke tab Network
+   - Refresh halaman
+   - Cari request dengan nama getGameRecordCard
+   - Salin nilai `Cookie` header
 
-3. **Configure your HoyoLab cookie in `.env`:**
+3. **Konfigurasi cookie HoyoLab Anda di `.env`:**
    ```bash
-   # HoyoLab Cookie (sama untuk semua game HoYoverse)
+   # Cookie HoyoLab (sama untuk semua game HoYoverse)
    HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
    ```
 
-4. **Configure your accounts in `config/accounts.json`:**
+4. **Konfigurasi akun Anda di `config/accounts.json`:**
    ```json
    [
      {
-       "name": "My Account",
+       "name": "Akun Gweh",
        "games": {
          "genshin": {
-           "enabled": true
+           "enabled": true,
+           "uid": "123456789",
+           "username": "TravelerMain"
          },
          "honkai_star_rail": {
-           "enabled": true
+           "enabled": true,
+           "uid": "987654321",
+           "username": "TrailblazerMain"
          },
          "zenless": {
-           "enabled": false
+           "enabled": false,
+           "uid": "",
+           "username": ""
          },
          "honkai_impact": {
-           "enabled": false
+           "enabled": false,
+           "uid": "",
+           "username": ""
          },
          "tears_of_themis": {
-           "enabled": false
+           "enabled": false,
+           "uid": "",
+           "username": ""
          }
        }
      }
    ]
    ```
 
-5. **Adjust settings in `.env` (optional):**
+5. **Sesuaikan pengaturan di `.env` (opsional):**
    ```bash
-   # Check-in schedule (cron format)
-   CHECKIN_SCHEDULE=5 0 * * *  # Daily at 00:05
+   # Jadwal check-in (format cron)
+   CHECKIN_SCHEDULE=5 0 * * *  # Harian pada jam 00:05
    
-   # Retry settings
+   # Pengaturan retry
    MAX_RETRIES=3
    RETRY_DELAY=5000
    
@@ -88,206 +124,190 @@ npm install
    DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
    ```
 
-### 3. Usage
+### 3. Penggunaan
 
-#### Simple Run (Recommended)
+#### Jalankan Sederhana (Direkomendasikan)
 ```bash
 npm start
-# or
+# atau
 node index.js
 ```
 
-The application will:
-1. Validate configuration
-2. Run initial check-in for today
-3. Send Discord notification with results
-4. Start automatic scheduler for daily check-ins
-5. Run in background until stopped
+Aplikasi akan:
+1. Validasi konfigurasi
+2. Jalankan check-in awal untuk hari ini
+3. Kirim notifikasi Discord dengan hasil
+4. Mulai scheduler otomatis untuk check-in harian
+5. Berjalan di background hingga dihentikan
 
-#### Stop the Application
+#### Hentikan Aplikasi
 ```bash
-# Press Ctrl+C in the terminal where it's running
+# Tekan Ctrl+C di terminal tempat aplikasi berjalan
 ```
 
-## Supported Games
+## Game yang Didukung
 
-| Game | Status | Check-in Rewards |
+| Game | Status | Reward Check-in |
 |------|--------|------------------|
-| Genshin Impact | ✅ | Primogems, Mora, Materials |
-| Honkai: Star Rail | ✅ | Stellar Jade, Credits, Materials |
-| Zenless Zone Zero | ✅ | Polychrome, Dennies, Materials |
-| Honkai Impact 3rd | 🚧 | Coming Soon |
-| Tears of Themis | 🚧 | Coming Soon |
+| Genshin Impact | ✅ | Primogem, Mora, Material |
+| Honkai: Star Rail | ✅ | Stellar Jade, Credit, Material |
+| Zenless Zone Zero | ✅ | Polychrome, Dennies, Material |
+| Honkai Impact 3rd | 🚧 | Segera Hadir |
+| Tears of Themis | 🚧 | Segera Hadir |
 
-## Features
+## Fitur Utama
 
-- ✅ **Automatic Startup**: Run once and it handles everything automatically
-- ✅ **Initial Check-in**: Performs check-in immediately on startup
-- ✅ **Discord Notifications**: Real-time notifications for all check-in activities
-- ✅ **Background Operation**: Runs continuously in background
-- ✅ **Error Handling**: Comprehensive error handling and recovery
-- ✅ **Multiple Accounts**: Support for multiple HoyoLab accounts
+- ✅ **Startup Otomatis**: Run and forget
+- ✅ **Check-in Awal**: Auto check-in saat startup
+- ✅ **Notifikasi Discord**: Notifikasi real-time untuk semua aktivitas check-in
+- ✅ **Operasi Background**: Berjalan terus menerus di background
+- ✅ **Multiple Account**: Support lebih dari satu akun HoyoLab
 
-## Configuration
+## Konfigurasi
 
-### Environment Variables (.env)
+### Variabel Environment (.env)
 
 ```bash
-# Check-in Schedule (cron format: minute hour day month weekday)
+# Jadwal Check-in (format cron: menit jam hari bulan hari_minggu)
 CHECKIN_SCHEDULE=5 0 * * *
 
-# Retry settings
+# Pengaturan retry
 MAX_RETRIES=3
 RETRY_DELAY=5000
 
-# HTTP timeout (milliseconds)
+# Timeout HTTP (milidetik)
 HTTP_TIMEOUT=30000
 
 # Discord Webhook untuk notifikasi
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
 
-# HoyoLab Cookie
+# Cookie HoyoLab
 HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
 ```
 
-### Cron Schedule Examples
+### Contoh Jadwal Cron
 
-- `5 0 * * *` - Every day at 00:05 (5 minutes past midnight)
-- `0 9 * * *` - Every day at 9:00 AM
-- `30 8 * * *` - Every day at 8:30 AM
-- `0 */6 * * *` - Every 6 hours
+- `5 0 * * *` - Setiap hari jam 00:05 (5 menit setelah tengah malam)
+- `0 9 * * *` - Setiap hari jam 9:00 pagi
+- `30 8 * * *` - Setiap hari jam 8:30 pagi
+- `0 */6 * * *` - Setiap 6 jam
 
-### Account Configuration
+### Konfigurasi Akun
 
-The `config/accounts.json` file supports multiple accounts and games. Since all HoYoverse games use the same HoyoLab cookie, you only need to configure the cookie once in the `.env` file:
+File `config/accounts.json` support beberapa akun dan game. Karena semua game HoYoverse menggunakan cookie HoyoLab yang sama, Jadi cuma perlu konfigurasi sekali di `.env`:
 
-**Environment Variables (.env):**
+**Variabel Environment (.env):**
 ```bash
-# HoyoLab Cookie (sama untuk semua game HoYoverse)
+# Cookie HoyoLab (sama untuk semua game HoYoverse)
 HOYOLAB_COOKIE=ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;
 ```
 
-**Account Configuration (config/accounts.json):**
+**Konfigurasi Akun (config/accounts.json):**
 ```json
 [
   {
-    "name": "Main Account",
+    "name": "Akunmu",
     "games": {
       "genshin": {
-        "enabled": true
+        "enabled": true,
+        "uid": "123456789",
+        "username": "TravelerMain"
       },
       "honkai_star_rail": {
-        "enabled": true
+        "enabled": true,
+        "uid": "987654321",
+        "username": "TrailblazerMain"
       },
       "zenless": {
-        "enabled": false
+        "enabled": false,
+        "uid": "",
+        "username": ""
       },
       "honkai_impact": {
-        "enabled": false
+        "enabled": false,
+        "uid": "",
+        "username": ""
       },
       "tears_of_themis": {
-        "enabled": false
+        "enabled": false,
+        "uid": "",
+        "username": ""
       }
     }
   },
   {
-    "name": "Alt Account",
+    "name": "Akun Ayang",
     "games": {
       "genshin": {
-        "enabled": true
+        "enabled": true,
+        "uid": "555666777",
+        "username": "TravelerAlt"
       },
       "honkai_star_rail": {
-        "enabled": false
+        "enabled": false,
+        "uid": "",
+        "username": ""
       }
     }
   }
 ]
 ```
 
-## How to Get Cookies
+## Cara Mendapatkan Cookie
 
-1. **Go to HoyoLab**: Visit [https://www.hoyolab.com/](https://www.hoyolab.com/)
-2. **Login**: Sign in with your HoYoverse account
-3. **Open Developer Tools**: Press F12 or right-click → Inspect
-4. **Go to Network Tab**: Click on the Network tab
-5. **Refresh Page**: Refresh the page while keeping developer tools open
-6. **Find Request**: Look for any request to `hoyolab.com` domains
-7. **Copy Cookie**: Click on the request → Headers → Request Headers → Copy the entire `Cookie` value
+1. **Pergi ke HoyoLab**: Kunjungi [https://www.hoyolab.com/](https://www.hoyolab.com/)
+2. **Login**: Masuk dengan akun Hoyolabmu
+3. **Buka Developer Tools**: Tekan F12 atau klik kanan → Inspect
+4. **Pergi ke Tab Network**: Klik pada tab Network
+6. **Cari Request**: Cari request yang mengandung `getGameRecordCard` di kolom Name/URL
+   - Request ini akan muncul otomatis saat halaman profile memuat data game
+7. **Salin Cookie**: Klik pada request `getGameRecordCard` → Headers → Request Headers → Salin seluruh bagian `Cookie`
 
-### Required Cookie Values
+### Nilai Cookie yang Diperlukan
 
-Your cookie must contain these values:
+Cookie harus ada bagian bagian ini:
 - `ltoken_v2` - Login token
 - `ltuid_v2` - User ID
 - `ltmid_v2` - Machine ID
 
-## Logging
+## Region Game
 
-Logs are saved in the `logs/` directory:
-- `combined.log` - All logs
-- `error.log` - Error logs only
+### Genshin Impact
+- `os_usa` - Amerika
+- `os_euro` - Eropa
+- `os_asia` - Asia
+- `os_cht` - TW/HK/MO
 
-Console output is colorized for better readability.
+### Honkai Star Rail
+- `prod_official_usa` - Amerika
+- `prod_official_eur` - Eropa  
+- `prod_official_asia` - Asia
+- `prod_official_cht` - TW/HK/MO
 
-## Troubleshooting
+### Zenless Zone Zero
+- `prod_gf_us` - Amerika
+- `prod_gf_eu` - Eropa
+- `prod_gf_jp` - Asia
+- `prod_gf_sg` - Asia Tenggara
 
-### Common Issues
+## Keamanan
 
-1. **Invalid Cookie Error**
-   - Make sure your cookie contains `ltoken_v2`, `ltuid_v2`, and `ltmid_v2`
-   - Try getting a fresh cookie from HoyoLab
+- **Penyimpanan Cookie**: Cookie disimpan lokal di file konfigurasi maisng-masing
+- **Tidak Ada Pengumpulan Data**: tidak mengirim data ke mana pun kecuali ke API resmi HoyoLab
+- **Open Source**: Semua kode dapat dilihat dan diaudit
 
-2. **Network Errors**
-   - Check your internet connection
-   - The application will automatically retry failed requests
+## Lisensi
 
-3. **Already Signed In**
-   - This is normal if you've already checked in for the day
-   - Check-ins reset daily at server time
-
-4. **Configuration Not Found**
-   - Make sure you've copied `accounts.example.json` to `accounts.json`
-   - Ensure the file is properly formatted JSON
-
-### Debug Mode
-
-Enable debug logging to see detailed request information:
-
-```bash
-# In .env file
-LOG_LEVEL=debug
-DEBUG=true
-```
-
-## Security
-
-- **Cookie Storage**: Cookies are stored locally in your configuration file
-- **No Data Collection**: This application doesn't send data anywhere except to official HoyoLab APIs
-- **Open Source**: All code is visible and auditable
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test your changes
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) untuk detail.
 
 ## Disclaimer
 
-This project is not affiliated with HoYoverse. Use at your own risk. The developers are not responsible for any account issues that may arise from using this tool.
+Proyek ini tidak berafiliasi dengan HoYoverse. Gunakan dengan risiko Anda sendiri. Developer tidak bertanggung jawab atas masalah akun yang mungkin timbul dari penggunaan tool ini.
 
 ## Support
 
-If you encounter any issues or have questions:
-1. Check the troubleshooting section
-2. Review the logs for error details
-3. Create an issue with detailed information
+Jika mengalami masalah atau memiliki pertanyaan:
+1. Review log untuk detail error
+2. Buat issue dengan informasi detail
 
 ---
-
-**Happy gaming! 🎮**
