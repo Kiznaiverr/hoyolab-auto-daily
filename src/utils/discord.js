@@ -5,7 +5,6 @@ class DiscordNotifier {
         this.webhookUrl = process.env.DISCORD_WEBHOOK_URL;
     }
 
-    // Mengirim notifikasi ke Discord webhook
     async sendNotification(embed) {
         if (!this.webhookUrl || this.webhookUrl === 'https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN') {
             console.log('[Discord] Webhook not configured, skipping notification');
@@ -135,6 +134,67 @@ class DiscordNotifier {
         const embed = {
             color: 0xff0000, // Red
             title: "Check-in Gagal!",
+            fields: fields,
+            timestamp: new Date().toISOString()
+        };
+
+        await this.sendNotification(embed);
+    }
+
+    async notifyAlreadyCheckedIn(accountName, gameName, accountInfo = null, totalDays = 0) {
+        const gameColors = {
+            'Genshin Impact': 0x4FC3F7,
+            'Honkai Star Rail': 0xFFD700,
+            'Zenless Zone Zero': 0xFF6B35,
+            'Honkai Impact 3rd': 0x8E24AA,
+            'Tears of Themis': 0xE91E63
+        };
+
+        const fields = [
+            {
+                name: "Game",
+                value: gameName,
+                inline: true
+            },
+            {
+                name: "Akun",
+                value: accountName,
+                inline: true
+            },
+            {
+                name: "Status",
+                value: "Sudah check-in hari ini",
+                inline: true
+            }
+        ];
+
+        if (accountInfo && accountInfo.uid) {
+            fields.push({
+                name: "UID",
+                value: accountInfo.uid,
+                inline: true
+            });
+        }
+
+        if (accountInfo && accountInfo.username) {
+            fields.push({
+                name: "Username",
+                value: accountInfo.username,
+                inline: true
+            });
+        }
+
+        if (totalDays > 0) {
+            fields.push({
+                name: "Total Check-in",
+                value: totalDays.toString(),
+                inline: true
+            });
+        }
+
+        const embed = {
+            color: gameColors[gameName] || 0x00aa00, // Green/Blue variants
+            title: "Sudah Check-in Hari Ini",
             fields: fields,
             timestamp: new Date().toISOString()
         };
