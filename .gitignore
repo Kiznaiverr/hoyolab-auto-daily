@@ -1,7 +1,7 @@
 /node_modules
 /.env
-/config/accounts.json
 /.github
 /.vscode
 /logs
 /package-lock.json
+config/account.json
