@@ -4,4 +4,4 @@
 /.vscode
 /logs
 /package-lock.json
-config/account.json
+config/accounts.json
