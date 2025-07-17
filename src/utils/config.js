@@ -12,7 +12,7 @@ class ConfigManager {
     loadConfig() {
         try {
             if (!fs.existsSync(this.configPath)) {
-                logger.warn('Config file not found. Please copy accounts.example.json to accounts.json and configure your accounts.');
+                logger.warn('File konfigurasi tidak ditemukan. Salin accounts.example.json ke accounts.json dan konfigurasi akun Anda.');
                 return;
             }
 
@@ -20,12 +20,12 @@ class ConfigManager {
             const config = JSON.parse(configData);
             
             this.accounts = config.accounts || [];
-            logger.info(`Loaded configuration for ${this.accounts.length} account(s)`);
+            logger.info(`Konfigurasi berhasil dimuat untuk ${this.accounts.length} akun`);
             
-            // Validate configuration
+            // Validasi konfigurasi
             this.validateConfig();
         } catch (error) {
-            logger.error('Failed to load configuration:', error.message);
+            logger.error('Gagal memuat konfigurasi:', error.message);
             process.exit(1);
         }
     }
@@ -33,34 +33,34 @@ class ConfigManager {
     validateConfig() {
         const hoyolabCookie = process.env.HOYOLAB_COOKIE;
         if (!hoyolabCookie || hoyolabCookie === 'ltoken_v2=your_ltoken_v2; ltuid_v2=your_ltuid_v2; ltmid_v2=your_ltmid_v2;') {
-            logger.warn('HOYOLAB_COOKIE not configured in .env file. Please add your HoyoLab cookie.');
+            logger.warn('HOYOLAB_COOKIE tidak dikonfigurasi di file .env. Silakan tambahkan cookie HoyoLab Anda.');
             return;
         }
 
         if (!this.validateCookie(hoyolabCookie)) {
-            logger.error('Invalid HOYOLAB_COOKIE format. Cookie must contain ltoken_v2, ltuid_v2, and ltmid_v2');
+            logger.error('Format HOYOLAB_COOKIE tidak valid. Cookie harus mengandung ltoken_v2, ltuid_v2, dan ltmid_v2');
             return;
         }
 
         if (this.accounts.length === 0) {
-            logger.warn('No accounts configured');
+            logger.warn('Tidak ada akun yang dikonfigurasi');
             return;
         }
 
         this.accounts.forEach((account, index) => {
             if (!account.name) {
-                logger.warn(`Account ${index + 1} has no name`);
+                logger.warn(`Akun ${index + 1} tidak memiliki nama`);
             }
 
             if (!account.games) {
-                logger.warn(`Account ${index + 1} has no games configured`);
+                logger.warn(`Akun ${index + 1} tidak memiliki konfigurasi game`);
                 return;
             }
 
             Object.keys(account.games).forEach(game => {
                 const gameConfig = account.games[game];
                 if (gameConfig.enabled === undefined) {
-                    logger.warn(`Account "${account.name}" has ${game} without enabled status`);
+                    logger.warn(`Akun "${account.name}" memiliki ${game} tanpa status enabled`);
                 }
             });
         });
@@ -101,6 +101,7 @@ class ConfigManager {
         };
     }
 
+    // Parsing cookie string menjadi object
     parseCookie(cookieString) {
         const cookies = {};
         if (!cookieString) return cookies;
@@ -115,6 +116,7 @@ class ConfigManager {
         return cookies;
     }
 
+    // Validasi format cookie
     validateCookie(cookieString) {
         const cookies = this.parseCookie(cookieString);
         const requiredKeys = ['ltoken_v2', 'ltuid_v2', 'ltmid_v2'];

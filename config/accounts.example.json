@@ -9,12 +9,12 @@
           "username": "MyIstri"
         },
         "starrail": {
-          "enabled": true,
+          "enabled": false,
           "uid": "987654321",
           "username": "MyKisah"
         },
         "zenless": {
-          "enabled": true,
+          "enabled": false,
           "uid": "555666777",
           "username": "MyBini"
         },
