@@ -1,0 +1,34 @@
+{
+  "accounts": [
+    {
+      "name": "Account 1",
+      "games": {
+        "genshin": {
+          "enabled": true,
+          "uid": "123456789",
+          "username": "MyIstri"
+        },
+        "starrail": {
+          "enabled": true,
+          "uid": "987654321",
+          "username": "MyKisah"
+        },
+        "zenless": {
+          "enabled": true,
+          "uid": "555666777",
+          "username": "MyBini"
+        },
+        "honkai": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        },
+        "tots": {
+          "enabled": false,
+          "uid": "",
+          "username": ""
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "hoyolab-auto-daily",
+  "version": "1.0.0",
+  "description": "Automated daily check-ins for HoyoLab games including Genshin Impact, Honkai Star Rail, Zenless Zone Zero",
+  "main": "index.js",
+  "bin": {
+    "hoyolab-auto": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "hoyolab",
+    "genshin-impact",
+    "honkai-star-rail",
+    "zenless-zone-zero",
+    "auto-checkin",
+    "automation",
+    "gaming"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "dotenv": "^17.2.0",
+    "node-cron": "^4.2.1"
+  }
+}
