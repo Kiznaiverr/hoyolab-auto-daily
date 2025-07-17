@@ -23,13 +23,14 @@ class BaseGame {
             const accountInfo = config.getAccountInfo(accountName, gameKey);
 
             const signInfo = await this.getSignInfo(cookie);
+            logger.debug(`Sign info result for ${this.name}: ${JSON.stringify(signInfo)}`);
             if (!signInfo.success) {
-                throw new Error('Failed to get sign-in info');
+                throw new Error(`Failed to get sign-in info: ${signInfo.error}`);
             }
 
             if (signInfo.data.isSigned) {
                 logger.info(`${this.name} - Account ${accountName}: Already signed in today`);
-                await discord.notifyAlreadyChecked(accountName, this.name, accountInfo);
+                // Tidak mengirim notifikasi untuk yang sudah check-in (hanya bot started dan success/error)
                 
                 return {
                     success: true,
@@ -53,7 +54,13 @@ class BaseGame {
             const currentReward = awardsData.data[signInfo.data.total];
             logger.info(`${this.name} - Account ${accountName}: Check-in successful! Reward: ${currentReward.name} x${currentReward.cnt}`);
 
-            await discord.notifySuccess(accountName, this.name, `${currentReward.name} x${currentReward.cnt}`, accountInfo);
+            const rewardInfo = {
+                name: currentReward.name,
+                count: currentReward.cnt || currentReward.count || 1,
+                icon: currentReward.icon
+            };
+
+            await discord.notifySuccess(accountName, this.name, rewardInfo, accountInfo, signInfo.data.total + 1);
 
             return {
                 success: true,

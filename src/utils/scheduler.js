@@ -172,16 +172,8 @@ class Scheduler {
                 alreadySigned: results.alreadySigned
             });
 
-            // Send initial notification about check-in results
-            await this.sendInitialNotification(results);
-
         } catch (error) {
             logger.error('Error during initial check-in:', error.message);
-            await discord.sendNotification(
-                '❌ Initial Check-in Failed',
-                `Error during startup check-in: ${error.message}`,
-                0xff0000
-            );
         } finally {
             this.isRunning = false;
         }
@@ -239,37 +231,6 @@ class Scheduler {
 
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Method untuk mengirim notifikasi awal startup
-    async sendInitialNotification(summary) {
-        const { total, successful, failed, alreadySigned } = summary;
-        
-        let title, description, color;
-        
-        if (failed > 0) {
-            title = '⚠️ Initial Auto Check-in Complete (With Errors)';
-            description = 'Bot telah dimulai dan menjalankan check-in awal dengan beberapa error';
-            color = 0xff9900; // Orange
-        } else if (successful > 0) {
-            title = '✅ Initial Auto Check-in Success';
-            description = 'Bot telah dimulai dan berhasil menjalankan check-in awal';
-            color = 0x00ff00; // Green
-        } else {
-            title = 'ℹ️ Initial Auto Check-in Complete';
-            description = 'Bot telah dimulai, semua game sudah check-in hari ini';
-            color = 0x0099ff; // Blue
-        }
-
-        const fields = [
-            { name: 'Total Games', value: total.toString(), inline: true },
-            { name: 'Success', value: successful.toString(), inline: true },
-            { name: 'Failed', value: failed.toString(), inline: true },
-            { name: 'Already Signed', value: alreadySigned.toString(), inline: true },
-            { name: 'Status', value: 'Auto check-in scheduler is now active', inline: false }
-        ];
-
-        await discord.sendNotification(title, description, color, fields);
     }
 }
 

@@ -38,38 +38,24 @@ async function main() {
             process.exit(1);
         }
 
-        // Validasi environment variables
         if (!process.env.HOYOLAB_COOKIE) {
             logger.error('HOYOLAB_COOKIE not found in .env file');
             process.exit(1);
         }
 
-        // Kirim notifikasi bahwa bot telah dimulai
-        await discord.sendNotification(
-            '🚀 HoyoLab Auto Check-in Started',
-            'Bot telah berhasil dijalankan dan siap melakukan auto check-in harian',
-            0x00ff00 // Green
-        );
+        await discord.notifyBotStarted();
 
-        // Jalankan check-in pertama kali
         logger.info('Running initial check-in...');
         await scheduler.runInitialCheckIn();
 
-        // Start scheduler untuk check-in otomatis harian
         scheduler.start();
         logger.info('Auto check-in scheduler started successfully');
         logger.info('Bot is now running in background...');
         
     } catch (error) {
         logger.error('Failed to start application:', error);
-        await discord.sendNotification(
-            '❌ HoyoLab Auto Check-in Failed to Start',
-            `Error: ${error.message}`,
-            0xff0000 // Red
-        );
         process.exit(1);
     }
 }
 
-// Langsung jalankan aplikasi tanpa CLI
 main();

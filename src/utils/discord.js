@@ -6,21 +6,13 @@ class DiscordNotifier {
     }
 
     // Mengirim notifikasi ke Discord webhook
-    async sendNotification(title, description, color = 0x00ff00, fields = []) {
+    async sendNotification(embed) {
         if (!this.webhookUrl || this.webhookUrl === 'https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN') {
             console.log('[Discord] Webhook not configured, skipping notification');
             return;
         }
 
         try {
-            const embed = {
-                title: title,
-                description: description,
-                color: color,
-                timestamp: new Date().toISOString(),
-                fields: fields
-            };
-
             const payload = {
                 embeds: [embed]
             };
@@ -32,98 +24,138 @@ class DiscordNotifier {
         }
     }
 
-    // Notifikasi sukses check-in
-    async notifySuccess(accountName, gameName, reward, accountInfo = null) {
-        const fields = [
-            { name: 'Account', value: accountName, inline: true },
-            { name: 'Game', value: gameName, inline: true },
-            { name: 'Reward', value: reward || 'Daily reward claimed', inline: false }
-        ];
+    async notifyBotStarted() {
+        const embed = {
+            color: 0x00ff00, // Green
+            title: "🤖 HoyoLab Auto Check-in Bot Started",
+            description: "Bot berhasil dijalankan dan siap melakukan check-in harian",
+            timestamp: new Date().toISOString()
+        };
 
-        // Tambahkan info account jika tersedia (opsional)
-        if (accountInfo) {
-            if (accountInfo.uid) {
-                fields.push({ name: 'UID', value: accountInfo.uid, inline: true });
-            }
-            if (accountInfo.username) {
-                fields.push({ name: 'Username', value: accountInfo.username, inline: true });
-            }
-        }
-
-        await this.sendNotification(
-            '✅ Daily Check-in Success',
-            `Check-in berhasil untuk ${gameName}`,
-            0x00ff00, // Green
-            fields
-        );
+        await this.sendNotification(embed);
     }
 
-    // Notifikasi gagal check-in
+    async notifySuccess(accountName, gameName, reward = null, accountInfo = null, totalDays = 0) {
+        const gameEmojis = {
+            'Genshin Impact': '⚔️',
+            'Honkai Star Rail': '🚂',
+            'Zenless Zone Zero': '🏙️',
+            'Honkai Impact 3rd': '⚡',
+            'Tears of Themis': '⚖️'
+        };
+
+        const gameColors = {
+            'Genshin Impact': 0x4FC3F7,
+            'Honkai Star Rail': 0xFFD700,
+            'Zenless Zone Zero': 0xFF6B35,
+            'Honkai Impact 3rd': 0x8E24AA,
+            'Tears of Themis': 0xE91E63
+        };
+
+        const fields = [
+            {
+                name: "🎮 Game",
+                value: `${gameEmojis[gameName] || '🎮'} ${gameName}`,
+                inline: true
+            },
+            {
+                name: "👤 Akun",
+                value: accountName,
+                inline: true
+            }
+        ];
+
+        if (accountInfo && accountInfo.uid) {
+            fields.push({
+                name: "🆔 UID",
+                value: accountInfo.uid,
+                inline: true
+            });
+        }
+
+        if (accountInfo && accountInfo.username) {
+            fields.push({
+                name: "🎪 Username",
+                value: accountInfo.username,
+                inline: true
+            });
+        }
+
+        if (totalDays > 0) {
+            fields.push({
+                name: "📅 Total Check-in",
+                value: totalDays.toString(),
+                inline: true
+            });
+        }
+
+        if (reward) {
+            fields.push({
+                name: "🎁 Reward Hari Ini",
+                value: `${reward.name} x${reward.count}`,
+                inline: false
+            });
+        }
+
+        const embed = {
+            color: gameColors[gameName] || 0x00ff00,
+            title: "✅ Check-in Berhasil!",
+            fields: fields,
+            timestamp: new Date().toISOString()
+        };
+
+        if (reward && reward.icon) {
+            embed.thumbnail = {
+                url: reward.icon
+            };
+        }
+
+        await this.sendNotification(embed);
+    }
+
     async notifyError(accountName, gameName, error, accountInfo = null) {
+        const gameEmojis = {
+            'Genshin Impact': '⚔️',
+            'Honkai Star Rail': '🚂',
+            'Zenless Zone Zero': '🏙️',
+            'Honkai Impact 3rd': '⚡',
+            'Tears of Themis': '⚖️'
+        };
+
         const fields = [
-            { name: 'Account', value: accountName, inline: true },
-            { name: 'Game', value: gameName, inline: true },
-            { name: 'Error', value: error, inline: false }
+            {
+                name: "🎮 Game",
+                value: `${gameEmojis[gameName] || '🎮'} ${gameName}`,
+                inline: true
+            },
+            {
+                name: "👤 Akun",
+                value: accountName,
+                inline: true
+            },
+            {
+                name: "❌ Error",
+                value: error,
+                inline: false
+            }
         ];
 
-        // Tambahkan info account jika tersedia (opsional)
-        if (accountInfo) {
-            if (accountInfo.uid) {
-                fields.push({ name: 'UID', value: accountInfo.uid, inline: true });
-            }
-            if (accountInfo.username) {
-                fields.push({ name: 'Username', value: accountInfo.username, inline: true });
-            }
+        if (accountInfo && accountInfo.uid) {
+            fields.push({
+                name: "🆔 UID",
+                value: accountInfo.uid,
+                inline: true
+            });
         }
 
-        await this.sendNotification(
-            '❌ Daily Check-in Failed',
-            `Check-in gagal untuk ${gameName}`,
-            0xff0000, // Red
-            fields
-        );
-    }
+        const embed = {
+            color: 0xff0000, // Red
+            title: "❌ Check-in Gagal!",
+            fields: fields,
+            timestamp: new Date().toISOString()
+        };
 
-    // Notifikasi sudah check-in hari ini
-    async notifyAlreadyChecked(accountName, gameName, accountInfo = null) {
-        const fields = [
-            { name: 'Account', value: accountName, inline: true },
-            { name: 'Game', value: gameName, inline: true }
-        ];
-
-        // Tambahkan info account jika tersedia (opsional)
-        if (accountInfo) {
-            if (accountInfo.uid) {
-                fields.push({ name: 'UID', value: accountInfo.uid, inline: true });
-            }
-            if (accountInfo.username) {
-                fields.push({ name: 'Username', value: accountInfo.username, inline: true });
-            }
-        }
-
-        await this.sendNotification(
-            'ℹ️ Already Checked In',
-            `Sudah check-in hari ini untuk ${gameName}`,
-            0xffff00, // Yellow
-            fields
-        );
-    }
-
-    // Notifikasi rangkuman harian
-    async notifyDailySummary(summary) {
-        const { total, success, failed, alreadyChecked } = summary;
-        
-        await this.sendNotification(
-            '📊 Daily Check-in Summary',
-            `Rangkuman check-in harian`,
-            0x0099ff, // Blue
-            [
-                { name: 'Total Games', value: total.toString(), inline: true },
-                { name: 'Success', value: success.toString(), inline: true },
-                { name: 'Failed', value: failed.toString(), inline: true },
-                { name: 'Already Checked', value: alreadyChecked.toString(), inline: true }
-            ]
-        );
+        await this.sendNotification(embed);
     }
 }
 
