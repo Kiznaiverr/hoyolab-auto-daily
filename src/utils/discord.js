@@ -27,7 +27,7 @@ class DiscordNotifier {
     async notifyBotStarted() {
         const embed = {
             color: 0x00ff00, // Green
-            title: "🤖 HoyoLab Auto Check-in Bot Started",
+            title: "HoyoLab Auto Check-in Bot Started",
             description: "Bot berhasil dijalankan dan siap melakukan check-in harian",
             timestamp: new Date().toISOString()
         };
@@ -36,14 +36,6 @@ class DiscordNotifier {
     }
 
     async notifySuccess(accountName, gameName, reward = null, accountInfo = null, totalDays = 0) {
-        const gameEmojis = {
-            'Genshin Impact': '⚔️',
-            'Honkai Star Rail': '🚂',
-            'Zenless Zone Zero': '🏙️',
-            'Honkai Impact 3rd': '⚡',
-            'Tears of Themis': '⚖️'
-        };
-
         const gameColors = {
             'Genshin Impact': 0x4FC3F7,
             'Honkai Star Rail': 0xFFD700,
@@ -54,12 +46,12 @@ class DiscordNotifier {
 
         const fields = [
             {
-                name: "🎮 Game",
-                value: `${gameEmojis[gameName] || '🎮'} ${gameName}`,
+                name: "Game",
+                value: gameName,
                 inline: true
             },
             {
-                name: "👤 Akun",
+                name: "Akun",
                 value: accountName,
                 inline: true
             }
@@ -67,7 +59,7 @@ class DiscordNotifier {
 
         if (accountInfo && accountInfo.uid) {
             fields.push({
-                name: "🆔 UID",
+                name: "UID",
                 value: accountInfo.uid,
                 inline: true
             });
@@ -75,7 +67,7 @@ class DiscordNotifier {
 
         if (accountInfo && accountInfo.username) {
             fields.push({
-                name: "🎪 Username",
+                name: "Username",
                 value: accountInfo.username,
                 inline: true
             });
@@ -83,7 +75,7 @@ class DiscordNotifier {
 
         if (totalDays > 0) {
             fields.push({
-                name: "📅 Total Check-in",
+                name: "Total Check-in",
                 value: totalDays.toString(),
                 inline: true
             });
@@ -91,7 +83,7 @@ class DiscordNotifier {
 
         if (reward) {
             fields.push({
-                name: "🎁 Reward Hari Ini",
+                name: "Reward Hari Ini",
                 value: `${reward.name} x${reward.count}`,
                 inline: false
             });
@@ -99,7 +91,7 @@ class DiscordNotifier {
 
         const embed = {
             color: gameColors[gameName] || 0x00ff00,
-            title: "✅ Check-in Berhasil!",
+            title: "Check-in Berhasil!",
             fields: fields,
             timestamp: new Date().toISOString()
         };
@@ -114,27 +106,19 @@ class DiscordNotifier {
     }
 
     async notifyError(accountName, gameName, error, accountInfo = null) {
-        const gameEmojis = {
-            'Genshin Impact': '⚔️',
-            'Honkai Star Rail': '🚂',
-            'Zenless Zone Zero': '🏙️',
-            'Honkai Impact 3rd': '⚡',
-            'Tears of Themis': '⚖️'
-        };
-
         const fields = [
             {
-                name: "🎮 Game",
-                value: `${gameEmojis[gameName] || '🎮'} ${gameName}`,
+                name: "Game",
+                value: gameName,
                 inline: true
             },
             {
-                name: "👤 Akun",
+                name: "Akun",
                 value: accountName,
                 inline: true
             },
             {
-                name: "❌ Error",
+                name: "Error",
                 value: error,
                 inline: false
             }
@@ -142,7 +126,7 @@ class DiscordNotifier {
 
         if (accountInfo && accountInfo.uid) {
             fields.push({
-                name: "🆔 UID",
+                name: "UID",
                 value: accountInfo.uid,
                 inline: true
             });
@@ -150,7 +134,7 @@ class DiscordNotifier {
 
         const embed = {
             color: 0xff0000, // Red
-            title: "❌ Check-in Gagal!",
+            title: "Check-in Gagal!",
             fields: fields,
             timestamp: new Date().toISOString()
         };

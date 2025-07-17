@@ -30,7 +30,6 @@ class BaseGame {
 
             if (signInfo.data.isSigned) {
                 logger.info(`${this.name} - Account ${accountName}: Already signed in today`);
-                // Tidak mengirim notifikasi untuk yang sudah check-in (hanya bot started dan success/error)
                 
                 return {
                     success: true,
@@ -92,7 +91,8 @@ class BaseGame {
                 ...options.headers
             },
             params: options.params,
-            ...options
+            timeout: options.timeout,
+            method: options.method
         };
 
         return httpClient.withRetry(async () => {

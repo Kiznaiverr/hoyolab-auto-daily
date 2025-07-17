@@ -6,22 +6,24 @@ class HttpClient {
         this.client = axios.create({
             timeout: parseInt(process.env.HTTP_TIMEOUT) || 30000,
             headers: {
-                'User-Agent': process.env.USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'User-Agent': process.env.USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                 'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Language': 'id-id,id;q=0.9,en;q=0.8',
                 'Accept-Encoding': 'gzip, deflate, br',
                 'Origin': 'https://act.hoyolab.com',
                 'Referer': 'https://act.hoyolab.com/',
-                'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
                 'Sec-Ch-Ua-Mobile': '?0',
                 'Sec-Ch-Ua-Platform': '"Windows"',
                 'Sec-Fetch-Dest': 'empty',
                 'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-site'
+                'Sec-Fetch-Site': 'same-site',
+                'x-rpc-app_version': '1.5.0',
+                'x-rpc-client_type': '5',
+                'x-rpc-language': 'id-id'
             }
         });
 
-        // Request interceptor
         this.client.interceptors.request.use(
             (config) => {
                 logger.debug(`Making ${config.method?.toUpperCase()} request to ${config.url}`);
@@ -33,7 +35,6 @@ class HttpClient {
             }
         );
 
-        // Response interceptor
         this.client.interceptors.response.use(
             (response) => {
                 logger.debug(`Received response from ${response.config.url}: ${response.status}`);

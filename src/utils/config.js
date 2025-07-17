@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const logger = require('./logger');
+require('dotenv').config();
 
 class ConfigManager {
     constructor() {
@@ -86,7 +87,6 @@ class ConfigManager {
         return process.env.HOYOLAB_COOKIE;
     }
 
-    // Mengambil informasi account untuk game tertentu (opsional)
     getAccountInfo(accountName, gameName) {
         const account = this.accounts.find(acc => acc.name === accountName);
         if (!account || !account.games || !account.games[gameName]) {
@@ -101,7 +101,6 @@ class ConfigManager {
         };
     }
 
-    // Parsing cookie string menjadi object
     parseCookie(cookieString) {
         const cookies = {};
         if (!cookieString) return cookies;
@@ -116,7 +115,6 @@ class ConfigManager {
         return cookies;
     }
 
-    // Validasi format cookie
     validateCookie(cookieString) {
         const cookies = this.parseCookie(cookieString);
         const requiredKeys = ['ltoken_v2', 'ltuid_v2', 'ltmid_v2'];
