@@ -31,6 +31,8 @@ class BaseGame {
             if (signInfo.data.isSigned) {
                 logger.info(`${this.name} - Account ${accountName}: Already signed in today`);
                 
+                await discord.notifyAlreadyCheckedIn(accountName, this.name, accountInfo, signInfo.data.total);
+                
                 return {
                     success: true,
                     alreadySigned: true,
